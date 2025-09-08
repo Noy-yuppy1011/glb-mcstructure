@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>GLB → .mcstructure (Bedrock)</title>
+  <link rel="stylesheet" href="./style.css">
+  <!-- three.js & GLTFLoader (ESM) -->
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
+    import { GLTFLoader } from 'https://unpkg.com/three@0.160.1/examples/jsm/loaders/GLTFLoader.js';
+    import { MeshBVH, acceleratedRaycast, MeshBVHVisualizer } from 'https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.1/build/index.module.js';
+    // expose to window for script.js
+    window.THREE = THREE;
+    window.GLTFLoader = GLTFLoader;
+    window.MeshBVH = MeshBVH;
+    THREE.Mesh.prototype.raycast = acceleratedRaycast;
+    window.MeshBVHVisualizer = MeshBVHVisualizer;
+  </script>
+  <!-- nbtify (browser NBT read/write) -->
+  <script type="module">
+    import { NBTWriter, Tag, Endianness } from 'https://cdn.jsdelivr.net/npm/nbtify@2.2.0/dist/index.min.js';
+    window.NBTWriter = NBTWriter;
+    window.NBTTag = Tag;
+    window.NBTEndianness = Endianness;
+  </script>
+</head>
+<body>
+  <main>
+    <h1>GLB → .mcstructure (Bedrock)</h1>
+
+    <section class="controls">
+      <label>GLBファイル: <input id="file" type="file" accept=".glb,.gltf"></label>
+
+      <div class="row">
+        <label>ボクセルサイズ（ブロック単位, 例 64）:
+          <input id="voxRes" type="number" min="4" max="256" step="1" value="64">
+        </label>
+        <label>最大寸法（ブロック, X/Y/Z 立方）:
+          <input id="maxDim" type="number" min="8" max="128" step="1" value="64">
+        </label>
+      </div>
+
+      <div class="row">
+        <label>ブロックID（埋める素材）:
+          <input id="blockId" type="text" value="minecraft:stone" placeholder="minecraft:stone">
+        </label>
+        <label>水没レイヤー出力（二層目）:
+          <input id="waterlogged" type="checkbox">
+        </label>
+      </div>
+
+      <button id="convert">.mcstructure を作成してダウンロード</button>
+    </section>
+
+    <canvas id="view" style="width:100%; height:360px;"></canvas>
+
+    <p class="note">
+      生成される .mcstructure は <code>format_version=1</code>、<code>size</code>、
+      <code>structure.block_indices</code>（二層: 基本/水没）、<code>palette.default.block_palette</code>、
+      <code>entities=[]</code>、<code>structure_world_origin=[0,0,0]</code> を含みます（Bedrock仕様）。 [oai_citation:3‡Bedrock Wiki](https://wiki.bedrock.dev/nbt/mcstructure)
+    </p>
+  </main>
+
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
